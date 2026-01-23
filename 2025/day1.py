@@ -57,53 +57,51 @@ def passes_zero(input, start):
     # Set the dial after the first move
     firstmove = moves[0]
     
+    # Calculate number of full rotations
+    full = int(firstmove[1:]) // 100
+    zero += full
+    
+    # Calculate next number and if dial passes zero
     if firstmove.startswith('R'):
         dial = start + int(firstmove[1:])
+        dial = dial % 100
         if dial < start:
             zero += 1
     else:
         dial = start - int(firstmove[1:])
-        if dial > start:
-            zero += 1
-    
-    dial = dial % 100
-    
-    if dial == 0:
-        zero += 1
-    
-    if abs(int(firstmove[1:])) > 99:
-        zero += abs(int(firstmove[1:])) // 100
+        dial = dial % 100
+        if dial > start or dial == 0:
+            if start != 0:
+                zero += 1
     
     # Loop through moves
     for move in moves[1:]:
+    
+        # Calculate number of full rotations
+        full = int(move[1:]) // 100
+        zero += full
+        
+        # Calculate next number and if dial passes zero
         if move.startswith('R'):
+            previous = dial
             dial = dial + int(move[1:])
-            if dial < start:
+            dial = dial % 100
+            if dial < previous:
                 zero += 1
         else:
+            previous = dial
             dial = dial - int(move[1:])
-            if dial > start:
-                zero += 1
-        
-        dial = dial % 100
-    
-        if dial == 0:
-            zero += 1
-     
-        if abs(int(move[1:])) > 99:
-            zero += abs(int(move[1:])) // 100
-    
+            dial = dial % 100
+            if dial > previous or dial == 0:
+                if previous != 0:
+                    zero += 1
     return zero
 
 
-passes_zero("day1_input.txt", 50) # Supposed to be 6892
+answer = passes_zero("day1_input.txt", 50) # 6892
 
+print(f"The password is {answer}")
 
 # Answers on Reddit
 # https://www.reddit.com/r/adventofcode/comments/1pb3y8p/2025_day_1_solutions/
-# Simpler solution is to total the number of turns and divide by 100
-
-
-
-
 
