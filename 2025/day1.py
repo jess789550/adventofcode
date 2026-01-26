@@ -39,7 +39,7 @@ def lands_on_zero(input, start):
     return zero
 
 
-answer = lands_on_zero("day1_input.txt", 50) # 1180
+answer = lands_on_zero("day1_input.txt", 50)
 
 print(f"The password is {answer}")
 
@@ -98,7 +98,7 @@ def passes_zero(input, start):
     return zero
 
 
-answer = passes_zero("day1_input.txt", 50) # 6892
+answer = passes_zero("day1_input.txt", 50)
 
 print(f"The password is {answer}")
 
