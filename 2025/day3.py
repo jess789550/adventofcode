@@ -35,7 +35,6 @@ def joltage_twelve(input):
     
     for line in lines:
         line = line.strip()
-        print("line", line)
         num = ""
         
         while len(num) < 12:
@@ -43,16 +42,11 @@ def joltage_twelve(input):
                 part_line = line
             else:
                 part_line = line[:-(11-len(num))] # work out biggest number but preserve remaining numbers
-            print("part_line", part_line)
             index = part_line.index(max(part_line)) # work out starting index
-            print("index", index)
             num += line[index] # Add number to results string
-            print("num", num)
             line = line[index+1:] # Chop numbers out
-            print("line", line)
         
         count += int(num)
-        print("count", count)
     
     return count
 
