@@ -78,7 +78,7 @@ def all_fresh_ids(file):
 # ChatGPT answer
 def all_fresh_ids_2(file):
     with open(file) as f:
-        lines = [line.strip() for line in f]
+        lines = [line.strip() for line in f]  # remove whitespace when parsing text file
     
     blank_line = lines.index("")
     
