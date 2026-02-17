@@ -1,5 +1,9 @@
 # Day 10 (ChatGPT driven)
 
+##########
+# Part 1
+##########
+
 from collections import deque  # double ended queue, like a special list but optimised
 import ast  # convert list of strings into list of tuples of integers for buttons; https://docs.python.org/3/library/ast.html
 
@@ -105,3 +109,99 @@ def answer(file):
 
 
 print("The fewest number of buttons pressed is", answer("day10_input.txt"))
+
+
+
+#####################
+
+
+##########
+# Part 2
+##########
+
+import numpy as np
+from scipy.optimize import linprog  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linprog.html
+
+# Function to figure out fewest number of button presses for joltage
+def solve_line(button_definitions, target):
+    
+    n = len(target)
+    m = len(button_definitions)
+    
+    A = np.zeros((n, m))  # matrix/array of zero's
+    
+    for j, button in enumerate(button_definitions):  # (index, button tuple) e.g. 0 (0, 2, 3, 4)
+        for idx in button:
+            A[idx][j] = 1  # update matrix
+    
+    c = np.ones(m)  # minimize sum(x)
+    
+    res = linprog(  # Linear programming: minimize a linear objective function subject to linear equality and inequality constraints.
+        c,
+        A_eq=A,
+        b_eq=target,
+        bounds=[(0, None)] * m,
+        method='interior-point'
+    )
+    
+    """
+    con: array([1.71258954e-08, 0.00000000e+00, 1.71258989e-08, 1.20515580e-08,
+       1.71258989e-08])
+    fun: 36.9999999828741
+    message: 'Optimization terminated successfully.'
+    nit: 4
+    slack: array([], dtype=float64)
+    status: 0
+    success: True
+    x: array([19.99999999,  8.        ,  8.99999999])
+    """
+
+    if not res.success:
+        return None
+    
+    # Because of matrix structure, solution is integer
+    return int(round(sum(res.x)))
+
+
+def answer2(file):
+    total = 0
+    
+    with open(file) as f:
+        for line in f:
+            parts = line.split()  # ['[...#.]', '(0,2,3,4)', '(1,2,3,4)', '(0,2,4)', '{29,8,37,28,37}']
+    
+            button_strings = parts[1:-1]  # ['(0,2,3,4)', '(1,2,3,4)', '(0,2,4)']
+            target_string = parts[-1]  # '{29,8,37,28,37}'
+    
+            button_definitions = []
+            for s in button_strings:
+                value = ast.literal_eval(s)  # str --> tuples
+                if isinstance(value, int):  # int --> tuple
+                    value = (value,)
+                button_definitions.append(value)  # [(0, 2, 3, 4), (1, 2, 3, 4), (0, 2, 4)]
+    
+            target = ast.literal_eval(
+                target_string.replace("{", "(").replace("}", ")")  # set --> tuple, (29, 8, 37, 28, 37)
+            )
+    
+            presses = solve_line(button_definitions, target)
+    
+            if presses is None:
+                raise ValueError("No valid solution for line: " + line)
+    
+            total += presses
+    
+    return total
+
+
+print("The fewest number of buttons pressed is", answer2("day10_input.txt"))
+
+"""
+https://www.reddit.com/r/adventofcode/comments/1pity70/2025_day_10_solutions/
+
+Other solutions used math, numbers, deque, functools, typing, numpy, collections, and fractions packages. They also created matrices.
+
+One person used scipy optimize functions milp (Mixed-integer linear programming) (https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.milp.html) and LinearConstraint (Linear constraint on the variables.) (https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.LinearConstraint.html)
+
+One person used the Z3-solver package which uses algorithms designed by Microsoft Research https://z3prover.github.io/papers/programmingz3.html
+"""
